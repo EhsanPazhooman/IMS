@@ -1,4 +1,6 @@
-﻿namespace IMS.UseCases.PluginInterfaces;
+﻿using IMS.CoreBusiness;
+
+namespace IMS.UseCases.PluginInterfaces;
 
 public interface IInventoryRepository
 {

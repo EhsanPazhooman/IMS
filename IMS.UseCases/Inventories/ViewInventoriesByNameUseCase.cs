@@ -1,4 +1,5 @@
-﻿using IMS.UseCases.PluginInterfaces;
+﻿using IMS.CoreBusiness;
+using IMS.UseCases.PluginInterfaces;
 
 namespace IMS.UseCases.Inventories;
 
