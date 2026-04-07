@@ -1,12 +1,13 @@
 ﻿using IMS.UseCases.PluginInterfaces;
+using IMS.UseCases.Products.Interfaces;
 
-namespace IMS.UseCases.Inventories;
+namespace IMS.UseCases.Products;
 
-public class DeleteInventoryUseCase : IDeleteInventoryUseCase
+public class DeleteProductUseCase : IDeleteProductUseCase
 {
     private readonly IProductRepository _productRepository;
 
-    public DeleteInventoryUseCase(IProductRepository productRepository)
+    public DeleteProductUseCase(IProductRepository productRepository)
     {
         _productRepository = productRepository;
     }
