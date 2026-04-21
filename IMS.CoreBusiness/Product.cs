@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using IMS.CoreBusiness.Validations;
 
 namespace IMS.CoreBusiness;
 
@@ -15,7 +16,8 @@ public class Product
     
     [Range(0,int.MaxValue,ErrorMessage ="Please enter a number greater or equal to 0.")]
     public double Price { get; set; }
-
+    
+    [Product_EnsurePriceIsGreaterThanInventoriesCost]
     public List<ProductInventory> ProductInventories { get; set; } = new List<ProductInventory>();
 
     public void AddInventory(Inventory inventory)
