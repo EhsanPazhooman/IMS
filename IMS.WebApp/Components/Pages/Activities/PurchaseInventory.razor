@@ -3,13 +3,15 @@
 @inject IViewInventoriesByNameUseCase ViewInventoriesByNameUseCase
 @inject IViewInventoryByIdUseCase ViewInventoryByIdUseCase
 @inject IPurchaseInventoryUseCase PurchaseInventoryUseCase
+@inject IJSRuntime JsRuntime
+
 
 @rendermode InteractiveServer
 
 <h3>Purchase Inventory</h3>
 <br/>
 
-<EditForm Model="purchaseViewModel" OnValidSubmit="Purchase">
+<EditForm id="purchase-form" Model="purchaseViewModel" OnValidSubmit="Purchase">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
     
@@ -47,7 +49,17 @@
     private PurchaseViewModel purchaseViewModel = new PurchaseViewModel();
 
     private Inventory? selectedInventory = null;
-    
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (firstRender)
+        {
+            JsRuntime.InvokeVoidAsync("preventFormSubmission", "purchase-form");
+        }
+    }
+
     private List<AutoCompleteComponent.ItemViewModel>? SearchInventory(string name)
     {
         var list = ViewInventoriesByNameUseCase.ExecuteAsync(name).GetAwaiter().GetResult();

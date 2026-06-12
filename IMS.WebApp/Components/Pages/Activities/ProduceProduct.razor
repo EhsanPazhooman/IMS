@@ -1,0 +1,95 @@
+﻿@page "/produce"
+
+@rendermode InteractiveServer
+
+@using IMS.UseCases.Activities
+@using IMS.UseCases.Products
+@using static IMS.WebApp.Components.Controls.Common.AutoCompleteComponent
+
+
+@inject IViewProductByIdUseCase ViewProductByIdUseCase
+@inject IViewProductsByNameUseCase ViewProductsByNameUseCase
+@inject IProduceProductUseCase ProduceProductUseCase
+@inject IJSRuntime JsRuntime
+
+
+<h3>ProduceProduct</h3>
+<br/>
+
+<EditForm id="produce-form" Model="produceViewModel" OnValidSubmit="Produce">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
+    <div class="form-group">
+        <label for="po">Production #</label>
+        <InputText id="po" @bind-Value="produceViewModel.ProductionNumber" class="form-control"></InputText>
+    </div>
+    <br/>
+    <div class="card">
+        <div class="card-body">
+            <div class="form-group">
+                <AutoCompleteComponent
+                    Label="Product to Produce"
+                    SearchFunction="SearchProduct"
+                    OnItemSelected="HandleItemSelected"></AutoCompleteComponent>
+                
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div class="form-group">
+        <label for="qty">Quantity #</label>
+        <InputNumber id="qty" @bind-Value="produceViewModel.QuantityToProduce" class="form-control"></InputNumber>
+    </div>
+    <br/>
+    <button type="submit" class="btn btn-primary">produce</button>
+</EditForm>
+
+@code {
+    private ProduceViewModel produceViewModel = new ProduceViewModel();
+    private Product? selectedProduct;
+    
+    private List<AutoCompleteComponent.ItemViewModel>? SearchProduct(string name)
+    {
+        var list = ViewProductsByNameUseCase.ExecuteAsync(name).GetAwaiter().GetResult();
+        if (list is null)
+            return null;
+
+        return list.Select(x => new AutoCompleteComponent.ItemViewModel { Id = x.ProductId, Name = x.ProductName })?
+            .ToList();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (firstRender)
+        {
+            JsRuntime.InvokeVoidAsync("preventFormSubmission", "produce-form");
+        }
+    }
+
+    
+    private async Task HandleItemSelected(AutoCompleteComponent.ItemViewModel item)
+    {
+        selectedProduct = await ViewProductByIdUseCase.ExecuteAsync(item.Id);
+        
+        this.produceViewModel.ProductId = item.Id;
+        produceViewModel.Product = this.selectedProduct;
+    }
+
+    private async Task Produce ()
+    {
+        await ProduceProductUseCase.ExecuteAsync(
+            this.produceViewModel.ProductionNumber,
+            selectedProduct,
+            this.produceViewModel.QuantityToProduce,
+            "Frank"
+        );
+
+        this.produceViewModel = new ProduceViewModel();
+        this.selectedProduct = null;
+    }
+    
+    
+}
